@@ -101,6 +101,8 @@
 #include "nrf_log_ctrl.h"
 #include "nrf_log_default_backends.h"
 
+#include "../../../components/libraries/eddystone/es.h"
+//#include "nrf_ble_es.h"
 
 #define PERIPHERAL_ADVERTISING_LED      BSP_BOARD_LED_2
 #define PERIPHERAL_CONNECTED_LED        BSP_BOARD_LED_3
@@ -750,10 +752,14 @@ static void on_ble_central_evt(ble_evt_t const * p_ble_evt)
                 // We do not want to connect to two peripherals offering the same service, so when
                 // a UUID is matched, we check that we are not already connected to a peer which
                 // offers the same service.
-                if (   (find_adv_uuid(&p_gap_evt->params.adv_report, BLE_UUID_HEART_RATE_SERVICE)
-                        && (m_conn_handle_hrs_c == BLE_CONN_HANDLE_INVALID))
-                    || (find_adv_uuid(&p_gap_evt->params.adv_report, BLE_UUID_RUNNING_SPEED_AND_CADENCE)
-                        && (m_conn_handle_rscs_c == BLE_CONN_HANDLE_INVALID)))
+                if ((find_adv_uuid(&p_gap_evt->params.adv_report, ES_UUID)
+                     && (m_conn_handle_hrs_c == BLE_CONN_HANDLE_INVALID)))
+
+                    /* || (find_adv_uuid(&p_gap_evt->params.adv_report, BLE_UUID_HEART_RATE_SERVICE) */
+                    /*  && (m_conn_handle_hrs_c == BLE_CONN_HANDLE_INVALID)) */
+
+                    /* || (find_adv_uuid(&p_gap_evt->params.adv_report, BLE_UUID_RUNNING_SPEED_AND_CADENCE) */
+                    /*     && (m_conn_handle_rscs_c == BLE_CONN_HANDLE_INVALID))) */
                 {
                     // Initiate connection.
                     err_code = sd_ble_gap_connect(&p_gap_evt->params.adv_report.peer_addr,
@@ -1307,7 +1313,7 @@ int main(void)
     conn_params_init();
     db_discovery_init();
     peer_manager_init();
-    hrs_c_init();
+    hrs_c_init(); // heart rate init
     rscs_c_init();
     services_init();
     advertising_init();
